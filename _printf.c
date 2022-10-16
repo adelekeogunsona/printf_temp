@@ -13,6 +13,8 @@ int _printf(const char *format, ...)
 	int i, total = 0, tmp;
 	char *str;
 
+	if (format == NULL)
+		return (0);
 	va_start(args, format);
 	for (i = 0; format[i]; i++)
 	{
@@ -41,10 +43,9 @@ int _printf(const char *format, ...)
 				tmp = va_arg(args, int);
 				print_int(tmp), total += digitlen(tmp);
 				break;
-			}
+			} continue;
 		}
-		else
-			_putchar(format[i]), total++;
+		_putchar(format[i]), total++;
 	}
 	va_end(args);
 	return (total);
