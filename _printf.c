@@ -14,7 +14,7 @@ int _printf(const char *format, ...)
 	char *str;
 
 	if (format == NULL)
-		return (0);
+		return (-1);
 	va_start(args, format);
 	for (i = 0; format[i]; i++)
 	{
@@ -22,27 +22,21 @@ int _printf(const char *format, ...)
 			continue;
 		if (format[i - 1] == '%' && check_specifier(format[i]) == 1)
 		{
-			switch (format[i])
-			{
-			case '%':
+
+			if (format[i] == '%')
 				_putchar('%'), total++;
-				break;
-			case 'c':
+			else if (format[i] == 'c')
 				print_c(va_arg(args, int)), total++;
-				break;
-			case 's':
+			else if (format[i] == 's')
+			{
 				str = va_arg(args, char *);
 				print_s(str);
 				total += _strlen(str);
-				break;
-			case 'd':
+			}
+			else if (format[i] == 'd' || format[i] == 'i')
+			{
 				tmp = va_arg(args, int);
 				print_int(tmp), total += digitlen(tmp);
-				break;
-			case 'i':
-				tmp = va_arg(args, int);
-				print_int(tmp), total += digitlen(tmp);
-				break;
 			} continue;
 		}
 		_putchar(format[i]), total++;
