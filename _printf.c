@@ -1,46 +1,93 @@
 #include "main.h"
 
 /**
- * _printf - Prints arguments to standard output
- * @format: Pointer to specifier
+ * check_specifiers - checks for valid format specifier
+ * @format: format
  *
- * Return: length of format
-*/
+ * Return: pointer to valid function or NULL
+ */
+static int (*check_specifiers(const char *format))(va_list)
+{
+	unsigned int i;
+	printer p[] = {
+		{"c", print_c},
+		{"s", print_s},
+		{"i", print_i},
+		{"d", print_d},
+		{"u", print_u},
+		{"b", print_b},
+		{"o", print_o},
+		{"x", print_x},
+		{"X", print_X},
+		{"p", print_p},
+		{"S", print_S},
+		{"r", print_r},
+		{"R", print_R},
+		{NULL, NULL}
+	};
 
+	for (i = 0; p[i].t != NULL; i++)
+	{
+		if (*(p[i].t) == *format)
+		{
+			break;
+		}
+	}
+	return (p[i].f);
+}
+
+/**
+ * _printf - prints all
+ * @format: format of arguments to print
+ *
+ * Return: total number of printed characters
+ */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int i, total = 0, tmp;
-	char *str;
+	unsigned int i = 0, total = 0;
+	va_list valist;
+	int (*f)(va_list);
 
 	if (format == NULL)
 		return (-1);
-	va_start(args, format);
-	for (i = 0; format[i]; i++)
+	va_start(valist, format);
+	while (format[i])
 	{
-		if (format[i] == '%' && check_specifier(format[i + 1]) == 1)
-			continue;
-		if (format[i - 1] == '%' && check_specifier(format[i]) == 1)
+		for (; format[i] != '%' && format[i]; i++)
 		{
-
-			if (format[i] == '%')
-				_putchar('%'), total++;
-			else if (format[i] == 'c')
-				print_c(va_arg(args, int)), total++;
-			else if (format[i] == 's')
-			{
-				str = va_arg(args, char *);
-				print_s(str);
-				total += _strlen(str);
-			}
-			else if (format[i] == 'd' || format[i] == 'i')
-			{
-				tmp = va_arg(args, int);
-				print_int(tmp), total += digitlen(tmp);
-			} continue;
+			_putchar(format[i]);
+			total++;
 		}
-		_putchar(format[i]), total++;
+		if (!format[i])
+			return (total);
+		f = check_specifiers(&format[i + 1]);
+		if (f != NULL)
+		{
+			total += f(valist);
+			i += 2;
+			continue;
+		}
+		if (!format[i + 1])
+			return (-1);
+		_putchar(format[i]);
+		total++;
+		if (format[i + 1] == '%')
+			i += 2;
+		else
+			i++;
 	}
-	va_end(args);
+	va_end(valist);
 	return (total);
+}
+
+/**
+ * _putchar - writes the character c to stdout
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
+ */
+int _putchar(char c)
+{
+	return (write(1, &c, 1));
 }
